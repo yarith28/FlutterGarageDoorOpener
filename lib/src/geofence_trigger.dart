@@ -12,11 +12,16 @@ abstract class GeofenceTrigger {
   static final _notificationPlugin = FlutterLocalNotificationsPlugin();
   static final _androidInitSettings =
       AndroidInitializationSettings('@mipmap/ic_launcher');
-  static final _initializationSettings =
-      InitializationSettings(_androidInitSettings, null);
-  static final _androidNot = AndroidNotificationDetails('garage_door_opener',
-      'garage_door_opener', 'Show when garage door is opened from geofencing');
-  static final _platNot = NotificationDetails(_androidNot, null);
+  static final _initializationSettings = InitializationSettings(
+    android: _androidInitSettings,
+    iOS: null,
+  );
+  static final _androidNot = AndroidNotificationDetails(
+    'garage_door_opener',
+    'garage_door_opener',
+    channelDescription: 'Show when garage door is opened from geofencing',
+  );
+  static final _platNot = NotificationDetails(android: _androidNot, iOS: null);
 
   static Future<void> postNotification(
           int id, String title, String body) async =>
@@ -29,7 +34,7 @@ abstract class GeofenceTrigger {
   ], notificationResponsiveness: 0, loiteringDelay: 0);
 
   static bool _isInitialized = false;
-  static StreamSubscription _locationUpdates;
+  static StreamSubscription? _locationUpdates;
 
   static Future<void> _initialize() async {
     if (!_isInitialized) {
@@ -43,7 +48,7 @@ abstract class GeofenceTrigger {
     print('Starting location updates');
     await GeofencingManager.promoteToForeground();
     _locationUpdates =
-        (await Geolocator().getPositionStream()).listen(_handleLocationUpdate);
+        Geolocator.getPositionStream().listen(_handleLocationUpdate);
   }
 
   static Future<void> _stopUpdates() async {
@@ -54,7 +59,7 @@ abstract class GeofenceTrigger {
 
   static Future<void> _handleLocationUpdate(Position p) async {
     final home = homeRegion.location;
-    final distance = await Geolocator().distanceBetween(
+    final distance = Geolocator.distanceBetween(
         p.latitude, p.longitude, home.latitude, home.longitude);
     print('Distance to home: $distance');
     if (distance < 100.0) {
@@ -63,7 +68,8 @@ abstract class GeofenceTrigger {
             'A geofence event has triggered the garage door!');
         await GarageDoorRemote.openDoor();
       } else {
-        await postNotification(0, 'Within 100m of home', 'Door is already open.');
+        await postNotification(
+            0, 'Within 100m of home', 'Door is already open.');
       }
       await _stopUpdates();
     }
@@ -86,7 +92,8 @@ abstract class GeofenceTrigger {
     if (event == GeofenceEvent.enter) {
       await _startUpdates();
     } else if ((event == GeofenceEvent.exit) && (_locationUpdates != null)) {
-      await postNotification(0, 'Leaving home geofence', 'Stopped frequent location updates.');
+      await postNotification(
+          0, 'Leaving home geofence', 'Stopped frequent location updates.');
       await _stopUpdates();
     }
   }

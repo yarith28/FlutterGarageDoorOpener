@@ -9,7 +9,7 @@ import 'garage_common.dart';
 bool _onBadCertificate(X509Certificate cert) => true;
 
 abstract class GarageDoorRemote {
-  static SecurityContext _context;
+  static SecurityContext? _context;
 
   static void initialize(SecurityContext context) => _context = context;
 
@@ -24,7 +24,7 @@ abstract class GarageDoorRemote {
       _sendRequest(garageOpenForEvent, delay: seconds);
 
   static Future<bool> _sendRequest(int type,
-      {int delay, bool returnResponse = false}) async {
+      {int? delay, bool returnResponse = false}) async {
     try {
       final connection = await SecureSocket.connect(
           garageExternalIP, garagePort,

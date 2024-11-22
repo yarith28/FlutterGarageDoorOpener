@@ -19,14 +19,14 @@ class GarageDoorOpener extends StatelessWidget {
     return new MaterialApp(
       title: 'Garage Door Opener',
       theme: ThemeData.light(),
-      home: new GarageDoorRemotePage(title: 'Garage Door Remote'),
+      home: GarageDoorRemotePage(title: 'Garage Door Remote'),
     );
   }
 }
 
 class GarageDoorRemotePage extends StatefulWidget {
-  GarageDoorRemotePage({Key key, this.title}) : super(key: key);
-  final String title;
+  GarageDoorRemotePage({Key? key, this.title}) : super(key: key);
+  final String? title;
 
   @override
   _GarageDoorRemoteState createState() => new _GarageDoorRemoteState();
@@ -40,7 +40,7 @@ enum DoorActivityState {
 
 class _GarageDoorRemoteState extends State<GarageDoorRemotePage> {
   static const kProximityToggleKey = 'proximity_toggle_state';
-  SharedPreferences sharedPreferences;
+  SharedPreferences? sharedPreferences;
   bool isOpen = false;
   DoorActivityState state = DoorActivityState.None;
 
@@ -54,7 +54,7 @@ class _GarageDoorRemoteState extends State<GarageDoorRemotePage> {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
       _proximityTriggerEnabled =
-          sharedPreferences.getBool(kProximityToggleKey) ?? false;
+          sharedPreferences?.getBool(kProximityToggleKey) ?? false;
     });
     initialize().then((void _) {
       _getGarageDoorState();
@@ -88,6 +88,7 @@ class _GarageDoorRemoteState extends State<GarageDoorRemotePage> {
   }
 
   void _timedClose() => GarageDoorRemote.closeDoorIn(30);
+
   void _timedOpenThenClose() => GarageDoorRemote.openDoorFor(60);
 
   static const double _outerButtonWidth = 425.0;
@@ -138,15 +139,16 @@ class _GarageDoorRemoteState extends State<GarageDoorRemotePage> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           Expanded(
-              child: RaisedButton(
-            shape: StadiumBorder(),
+              child: ElevatedButton(
+            // shape: StadiumBorder(),
             child: Text(text),
-            onPressed: onPressed,
+            onPressed: () => onPressed,
           ))
         ],
       ));
 
   bool _proximityTriggerEnabled = false;
+
   Widget _proximityTriggerToggle() => Container(
       padding: const EdgeInsets.fromLTRB(26.0, 2.5, 26.0, 2.5),
       child: Row(
@@ -159,7 +161,7 @@ class _GarageDoorRemoteState extends State<GarageDoorRemotePage> {
             onChanged: (bool state) async {
               setState(() {
                 _proximityTriggerEnabled = state;
-                sharedPreferences.setBool(
+                sharedPreferences?.setBool(
                     kProximityToggleKey, _proximityTriggerEnabled);
               });
               if (state) {
@@ -177,9 +179,9 @@ class _GarageDoorRemoteState extends State<GarageDoorRemotePage> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title.toString()),
       ),
       body: new Column(
         children: [
