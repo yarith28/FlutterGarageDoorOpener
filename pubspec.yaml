@@ -41,10 +41,10 @@ flutter:
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
 
-  assets:
-    - certs/client.key
-    - certs/client.crt
-    - certs/domain.crt
+#  assets:
+#    - certs/client.key
+#    - certs/client.crt
+#    - certs/domain.crt
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
